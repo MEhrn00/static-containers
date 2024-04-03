@@ -141,7 +141,7 @@ jobs:
       - name: Download mingw build
         uses: actions/download-artifact@v4
         with:
-          name: libssl-mingw64.tar.gz
+          name: libssl-mingw.tar.gz
           path: dist
 
       - name: Create release

@@ -27,6 +27,9 @@ jobs:
       contents: read
 
     steps:
+      - name: Lowercase registry url
+        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -49,7 +52,7 @@ jobs:
           set: |
             *.args.OPENSSL_VERSION=${{ env.openssl-version }}
             *.args.OPENSSL_HASH=${{ env.openssl-sha256sum }}
-            *.tags=${{ env.registry-url }}:base-${{ env.openssl-version }}
+            *.tags=${{ env.registry-url }}:libssl-base-${{ env.openssl-version }}
 
   build:
     runs-on: ubuntu-latest
@@ -64,6 +67,9 @@ jobs:
           - mingw
 
     steps:
+      - name: Lowercase registry url
+        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -71,7 +77,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Pull base image
-        run: docker pull ${{ env.registry-url }}:base-${{ env.openssl-version}}
+        run: docker pull ${{ env.registry-url }}:libssl-base-${{ env.openssl-version}}
 
       - name: Build libssl
         uses: docker/bake-action@v4
@@ -79,6 +85,10 @@ jobs:
           push: false
           workdir: libssl
           targets: ${{ matrix.target }}
+          set: |
+            target.base.args.OPENSSL_VERSION=${{ env.openssl-version }}
+            target.base.args.OPENSSL_HASH=${{ env.openssl-sha256sum }}
+            target.base.tags=${{ env.registry-url }}:libssl-base-${{ env.openssl-version }}
 
       - name: Upload libssl tarball
         uses: actions/upload-artifact@v4

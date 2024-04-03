@@ -91,9 +91,9 @@ jobs:
           workdir: libssl
           targets: ${{ matrix.target }}
           set: |
-            target.base.args.OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
-            target.base.args.OPENSSL_HASH=${{ env.OPENSSL_SHA256SUM }}
-            target.base.tags=${{ env.REGISTRY_URL }}:libssl-base-${{ env.OPENSSL_VERSION }}
+            base.args.OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
+            base.args.OPENSSL_HASH=${{ env.OPENSSL_SHA256SUM }}
+            base.tags=${{ env.REGISTRY_URL }}:libssl-base-${{ env.OPENSSL_VERSION }}
 
       - name: Upload libssl tarball
         uses: actions/upload-artifact@v4

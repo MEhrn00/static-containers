@@ -28,11 +28,13 @@ jobs:
       contents: read
 
     steps:
-      - name: Lowercase registry url
-        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
-
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Lowercase registry url
+        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+        env:
+          registry-url: ${{ env.registry-url }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -68,11 +70,14 @@ jobs:
           - mingw
 
     steps:
-      - name: Lowercase registry url
-        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
-
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Lowercase registry url
+        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+        env:
+          registry-url: ${{ env.registry-url }}
+
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3

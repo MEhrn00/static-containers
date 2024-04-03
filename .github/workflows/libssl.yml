@@ -10,9 +10,9 @@ on:
       - .github/workflows/libssl.yml
 
 env:
-  openssl-version: "3.2.1"
-  openssl-sha256sum: "83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39"
-  registry-url: ghcr.io/${{ github.repository }}
+  OPENSSL_VERSION: "3.2.1"
+  OPENSSL_SHA256SUM: "83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39"
+  REGISTRY_URL: ghcr.io/${{ github.repository }}
 
 concurrency:
   group: "build"
@@ -32,9 +32,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lowercase registry url
-        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+        run: echo "REGISTRY_URL=${REGISTRY_URL,,}" >> ${GITHUB_ENV}
         env:
-          registry-url: ${{ env.registry-url }}
+          REGISTRY_URL: ${{ env.REGISTRY_URL }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -53,9 +53,9 @@ jobs:
           workdir: libssl
           targets: base
           set: |
-            *.args.OPENSSL_VERSION=${{ env.openssl-version }}
-            *.args.OPENSSL_HASH=${{ env.openssl-sha256sum }}
-            *.tags=${{ env.registry-url }}:libssl-base-${{ env.openssl-version }}
+            *.args.OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
+            *.args.OPENSSL_HASH=${{ env.OPENSSL_SHA256SUM }}
+            *.tags=${{ env.REGISTRY_URL }}:libssl-base-${{ env.OPENSSL_VERSION }}
 
   build:
     runs-on: ubuntu-latest
@@ -74,16 +74,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lowercase registry url
-        run: echo "registry-url=${registry-url,,}" >> ${GITHUB_ENV}
+        run: echo "REGISTRY_URL=${REGISTRY_URL,,}" >> ${GITHUB_ENV}
         env:
-          registry-url: ${{ env.registry-url }}
-
+          REGISTRY_URL: ${{ env.REGISTRY_URL }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Pull base image
-        run: docker pull ${{ env.registry-url }}:libssl-base-${{ env.openssl-version}}
+        run: docker pull ${{ env.REGISTRY_URL }}:libssl-base-${{ env.OPENSSL_VERSION }}
 
       - name: Build libssl
         uses: docker/bake-action@v4
@@ -92,9 +91,9 @@ jobs:
           workdir: libssl
           targets: ${{ matrix.target }}
           set: |
-            target.base.args.OPENSSL_VERSION=${{ env.openssl-version }}
-            target.base.args.OPENSSL_HASH=${{ env.openssl-sha256sum }}
-            target.base.tags=${{ env.registry-url }}:libssl-base-${{ env.openssl-version }}
+            target.base.args.OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
+            target.base.args.OPENSSL_HASH=${{ env.OPENSSL_SHA256SUM }}
+            target.base.tags=${{ env.REGISTRY_URL }}:libssl-base-${{ env.OPENSSL_VERSION }}
 
       - name: Upload libssl tarball
         uses: actions/upload-artifact@v4
@@ -144,4 +143,4 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create libssl-${{ env.openssl-version }} -R ${{ github.repository }} -t openssl-${{ env.openssl-version }} dist/*.tar.gz
+        run: gh release create libssl-${{ env.OPENSSL_VERSION }} -R ${{ github.repository }} -t openssl-${{ env.openssl-version }} dist/*.tar.gz
